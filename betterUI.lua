@@ -1,4 +1,5 @@
 local ui = require("ui")
+local sys = require("sys")
 require("canvas")
 require("enum")
 require("colorProcess")
@@ -128,9 +129,17 @@ function _G.Window(WindowProperties)
     canvas.align = "all"
     canvas.bgcolor = hexA(WindowProperties.bgcolor) or 0x000000FF
 
+    local lastUpdate = sys.clock()
+    local targetFps = betterUI.TARGET_FPS or 60
+    local frameDuration = 1000 / targetFps
     function canvas:onPaint()
-        betterUI.canvas_update_func(canvas)
-        Event:fire("canvasOnPaint")
+        local currentTime = sys.clock()
+        local deltaTime = currentTime - lastUpdate
+
+        if deltaTime >= frameDuration then
+            betterUI.canvas_update_func(canvas)
+            Event:fire("canvasOnPaint")
+        end
     end
 
     function canvas:onClick()
@@ -494,6 +503,142 @@ function _G.CheckBox(CheckBoxProperties)
     return betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME]
 end
 
+function _G.Line(LineProperties)
+    local canvas = betterUI.currentlyEditingWindow.canvas
+
+    local CONTROL_TABLE = {
+        x0 = LineProperties.x0 or 0;
+        y0 = LineProperties.y0 or 0;
+        x1 = LineProperties.x1 or 0;
+        y1 = LineProperties.y1 or 0;
+        thickness = LineProperties.thickness or 1;
+        zindex = LineProperties.zindex or 0;
+        cursor = LineProperties.cursor or "arrow";
+        bgcolor = LineProperties.bgcolor or 0x000000FF;
+        visible = LineProperties.visible == nil and true or LineProperties.visible == true and true or false;
+        --enabled = LineProperties.enabled == nil and true or LineProperties.enabled == true and true or false;
+        BUI = {
+            TYPE = "LINE";
+            NAME = LineProperties.name or _G.betterUI:uniqueName();
+            MOUSE_HOVERING = false;
+        }
+    }
+
+    CONTROL_TABLE.draw = function(f)
+        if f then
+            f(CONTROL_TABLE)
+        end
+        canvas:line(CONTROL_TABLE.x0, CONTROL_TABLE.y0, CONTROL_TABLE.x1, CONTROL_TABLE.y1, hexA(CONTROL_TABLE.bgcolor), CONTROL_TABLE.thickness)
+        return true
+    end
+
+    CONTROL_TABLE.onHover = LineProperties.onHover or function() end
+    CONTROL_TABLE.onLeave = LineProperties.onLeave or function() end
+    CONTROL_TABLE.onClick = LineProperties.onClick or function() end
+    CONTROL_TABLE.onRightClick = LineProperties.onRightClick or function() end
+    CONTROL_TABLE.onMouseUp = LineProperties.onMouseUp or function() end
+
+
+    betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME] = CONTROL_TABLE
+    return betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME]
+end
+
+function _G.Circle(CircleProperties)
+    local canvas = betterUI.currentlyEditingWindow.canvas
+
+    local CONTROL_TABLE = {
+        x = CircleProperties.x or 0;
+        y = CircleProperties.y or 0;
+        width = CircleProperties.width or 20;
+        height = CircleProperties.height or 20;
+        radius = CircleProperties.radius or 0;
+        zindex = CircleProperties.zindex or 0;
+        cursor = CircleProperties.cursor or "arrow";
+        bgcolor = CircleProperties.bgcolor or 0x000000FF;
+        visible = CircleProperties.visible == nil and true or CircleProperties.visible == true and true or false;
+        --enabled = CircleProperties.enabled == nil and true or CircleProperties.enabled == true and true or false;
+        BUI = {
+            TYPE = "CIRCLE";
+            NAME = CircleProperties.name or _G.betterUI:uniqueName();
+            MOUSE_HOVERING = false;
+        }
+    }
+
+    CONTROL_TABLE.draw = function(f)
+        if f then
+            f(CONTROL_TABLE)
+        end
+        CONTROL_TABLE.radius = CONTROL_TABLE.width / 2
+        drawRectangle(canvas, CONTROL_TABLE.x, CONTROL_TABLE.y, CONTROL_TABLE.width, CONTROL_TABLE.height, CONTROL_TABLE.radius, CONTROL_TABLE.radius, hexA(CONTROL_TABLE.bgcolor))
+        return true
+    end
+
+
+    CONTROL_TABLE.onHover = CircleProperties.onHover or function() end
+    CONTROL_TABLE.onLeave = CircleProperties.onLeave or function() end
+    CONTROL_TABLE.onClick = CircleProperties.onClick or function() end
+    CONTROL_TABLE.onRightClick = CircleProperties.onRightClick or function() end
+    CONTROL_TABLE.onMouseUp = CircleProperties.onMouseUp or function() end
+
+
+    betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME] = CONTROL_TABLE
+    return betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME]
+end
+
+function _G.Border(BorderProperties)
+    local canvas = betterUI.currentlyEditingWindow.canvas
+
+    local CONTROL_TABLE = {
+        x = BorderProperties.x or 0;
+        y = BorderProperties.y or 0;
+        width = BorderProperties.width or 20;
+        height = BorderProperties.height or 20;
+        radius = BorderProperties.radius or 0;
+        zindex = BorderProperties.zindex or 0;
+        cursor = BorderProperties.cursor or "arrow";
+        thickness = BorderProperties.thickness or 1;
+        bgcolor = BorderProperties.bgcolor or 0x000000FF;
+        element = BorderProperties.element;
+        visible = BorderProperties.visible == nil and true or BorderProperties.visible == true and true or false;
+        --enabled = BorderProperties.enabled == nil and true or BorderProperties.enabled == true and true or false;
+        BUI = {
+            TYPE = "STROKE";
+            NAME = BorderProperties.name or _G.betterUI:uniqueName();
+            MOUSE_HOVERING = false;
+            BORDER_OF_ELEMENT = BorderProperties.element;
+        }
+    }
+
+    CONTROL_TABLE.draw = function(f)
+        if f then
+            f(CONTROL_TABLE)
+        end
+        if CONTROL_TABLE.element then
+            CONTROL_TABLE.x = CONTROL_TABLE.element.x
+            CONTROL_TABLE.y = CONTROL_TABLE.element.y
+            CONTROL_TABLE.width = CONTROL_TABLE.element.width
+            CONTROL_TABLE.height = CONTROL_TABLE.element.height
+            if CONTROL_TABLE.element.radius then
+                CONTROL_TABLE.radius = CONTROL_TABLE.element.radius
+            else
+                CONTROL_TABLE.radius = 0
+            end
+        end
+        drawBorder(canvas, CONTROL_TABLE.x, CONTROL_TABLE.y, CONTROL_TABLE.width, CONTROL_TABLE.height, CONTROL_TABLE.radius, CONTROL_TABLE.radius, hexA(CONTROL_TABLE.bgcolor), CONTROL_TABLE.thickness)
+        return true
+    end
+
+    CONTROL_TABLE.onHover = BorderProperties.onHover or function() end
+    CONTROL_TABLE.onLeave = BorderProperties.onLeave or function() end
+    CONTROL_TABLE.onClick = BorderProperties.onClick or function() end
+    CONTROL_TABLE.onRightClick = BorderProperties.onRightClick or function() end
+    CONTROL_TABLE.onMouseUp = BorderProperties.onMouseUp or function() end
+
+
+    betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME] = CONTROL_TABLE
+    return betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME]
+end
+
 function betterUI:MousePositionAccordToWindow(window)
     local mouseX, mouseY = ui.mousepos()
     local windowX, windowY = window.x, window.y
@@ -602,6 +747,38 @@ function betterUI:isMouseOnElementHitbox(element)
     return isInsideX and isInsideY
 end
 
+function betterUI:isMouseOnLine(line)
+    local mouseX, mouseY = ui.mousepos()
+    if betterUI.currentlyEditingWindow._windowproperties.style ~= Enum.WindowStyle.Raw then
+        if betterUI.currentlyEditingWindow.y == 0 then
+            mouseY = mouseY - 22
+        else
+            mouseY = mouseY - 32
+        end
+    end
+
+    local x0, y0 = line.x0, line.y0
+    local x1, y1 = line.x1, line.y1
+
+    local windowX = betterUI.currentlyEditingWindow.x
+    local windowY = betterUI.currentlyEditingWindow.y
+    local localMouseX = mouseX - windowX
+    local localMouseY = mouseY - windowY
+
+    local lineDX = x1 - x0
+    local lineDY = y1 - y0
+    local lineLength = math.sqrt(lineDX * lineDX + lineDY * lineDY)
+
+    local t = ((localMouseX - x0) * lineDX + (localMouseY - y0) * lineDY) / (lineLength * lineLength)
+    t = math.max(0, math.min(1, t))
+
+    local closestX = x0 + t * lineDX
+    local closestY = y0 + t * lineDY
+
+    local distance = math.sqrt((localMouseX - closestX)^2 + (localMouseY - closestY)^2)
+
+    return distance <= (line.thickness / 2)
+end
 
 local function onPaint(canvas)
     local self = canvas
@@ -625,67 +802,97 @@ end
 
 
 local function onClick(canvas)
-   local self = canvas
-   for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
-        if betterUI:isMouseOnElementHitbox(element) then
-            if betterUI:getTopElementAtMouse() == element then
-                if element.onClick then
-                    element.onClick()
-                end
-            end
-        end
-    end
-end
-
-local function onMouseUp(canvas)
-   local self = canvas
-   for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
-        if betterUI:isMouseOnElementHitbox(element) then
-            if betterUI:getTopElementAtMouse() == element then
-                if element.onMouseUp then
-                    element.onMouseUp()
-                end
-            end
-        end
-    end
-end
-
-local function onContext(canvas)
-   local self = canvas
-   for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
-        if betterUI:isMouseOnElementHitbox(element) then
-            if betterUI:getTopElementAtMouse() == element then
-                if element.onRightClick then
-                    element.onRightClick()
-                end
-            end
-        end
-    end
-end
+    for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
+         if element.BUI.TYPE == "LINE" then
+             if betterUI:isMouseOnLine(element) then
+                 if element.onClick then
+                     element.onClick()
+                 end
+             end
+         elseif betterUI:isMouseOnElementHitbox(element) then
+             if betterUI:getTopElementAtMouse() == element then
+                 if element.onClick then
+                     element.onClick()
+                 end
+             end
+         end
+     end
+ end
+ 
+ local function onMouseUp(canvas)
+    for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
+         if element.BUI.TYPE == "LINE" then
+             if betterUI:isMouseOnLine(element) then
+                 if element.onMouseUp then
+                     element.onMouseUp()
+                 end
+             end
+         elseif betterUI:isMouseOnElementHitbox(element) then
+             if betterUI:getTopElementAtMouse() == element then
+                 if element.onMouseUp then
+                     element.onMouseUp()
+                 end
+             end
+         end
+     end
+ end
+ 
+ local function onContext(canvas)
+    for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
+         if element.BUI.TYPE == "LINE" then
+             if betterUI:isMouseOnLine(element) then
+                 if element.onRightClick then
+                     element.onRightClick()
+                 end
+             end
+         elseif betterUI:isMouseOnElementHitbox(element) then
+             if betterUI:getTopElementAtMouse() == element then
+                 if element.onRightClick then
+                     element.onRightClick()
+                 end
+             end
+         end
+     end
+ end
 
 local function onHover(canvas)
-   local self = canvas
-   for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
-        if betterUI:isMouseOnElementHitbox(element) then
-                if element.onHover then
-                    if element.BUI.MOUSE_HOVERING then
-                        return
-                    end
-                    element.onHover()
-                    element.BUI.MOUSE_HOVERING = true
-                    if element.cursor then
-                        betterUI.CURSORTO = element.cursor
-                    end
-                end
-            else
-                if element.BUI.MOUSE_HOVERING then
-                    element.onLeave()
-                    element.BUI.MOUSE_HOVERING = false
-                    betterUI.CURSORTO = "arrow"
-                end
-        end
-    end
-end
+    local self = canvas
+    for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
+         if element.BUI.TYPE == "LINE" then
+             if betterUI:isMouseOnLine(element) then
+                 if element.onHover and not element.BUI.MOUSE_HOVERING then
+                     element.onHover()
+                     element.BUI.MOUSE_HOVERING = true
+                     if element.cursor then
+                         betterUI.CURSORTO = element.cursor
+                     end
+                 end
+             else
+                 if element.BUI.MOUSE_HOVERING then
+                     element.onLeave()
+                     element.BUI.MOUSE_HOVERING = false
+                     betterUI.CURSORTO = "arrow"
+                 end
+             end
+         else
+             if betterUI:isMouseOnElementHitbox(element) then
+                 if element.onHover and not element.BUI.MOUSE_HOVERING then
+                     element.onHover()
+                     element.BUI.MOUSE_HOVERING = true
+                     if element.cursor then
+                         betterUI.CURSORTO = element.cursor
+                     end
+                 end
+             else
+                 if element.BUI.MOUSE_HOVERING then
+                     element.onLeave()
+                     element.BUI.MOUSE_HOVERING = false
+                     betterUI.CURSORTO = "arrow"
+                 end
+             end
+         end
+     end
+ end
 
 
 _G.betterUI.canvas_click_func = onClick
