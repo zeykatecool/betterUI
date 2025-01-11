@@ -597,12 +597,12 @@ function _G.Border(BorderProperties)
         zindex = BorderProperties.zindex or 0;
         cursor = BorderProperties.cursor or "arrow";
         thickness = BorderProperties.thickness or 1;
-        bgcolor = BorderProperties.bgcolor or 0x000000FF;
+        color = BorderProperties.color or 0x000000FF;
         element = BorderProperties.element;
         visible = BorderProperties.visible == nil and true or BorderProperties.visible == true and true or false;
         --enabled = BorderProperties.enabled == nil and true or BorderProperties.enabled == true and true or false;
         BUI = {
-            TYPE = "STROKE";
+            TYPE = "BORDER";
             NAME = BorderProperties.name or _G.betterUI:uniqueName();
             MOUSE_HOVERING = false;
             BORDER_OF_ELEMENT = BorderProperties.element;
@@ -623,8 +623,9 @@ function _G.Border(BorderProperties)
             else
                 CONTROL_TABLE.radius = 0
             end
+            CONTROL_TABLE.zindex = CONTROL_TABLE.element.zindex + 1
         end
-        drawBorder(canvas, CONTROL_TABLE.x, CONTROL_TABLE.y, CONTROL_TABLE.width, CONTROL_TABLE.height, CONTROL_TABLE.radius, CONTROL_TABLE.radius, hexA(CONTROL_TABLE.bgcolor), CONTROL_TABLE.thickness)
+        drawBorder(canvas, CONTROL_TABLE.x, CONTROL_TABLE.y, CONTROL_TABLE.width, CONTROL_TABLE.height, CONTROL_TABLE.radius, CONTROL_TABLE.radius, hexA(CONTROL_TABLE.color), CONTROL_TABLE.thickness)
         return true
     end
 
