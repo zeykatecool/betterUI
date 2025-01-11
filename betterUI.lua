@@ -129,24 +129,8 @@ function _G.Window(WindowProperties)
     canvas.bgcolor = hexA(WindowProperties.bgcolor) or 0x000000FF
 
     function canvas:onPaint()
-        --betterUI.canvas_update_func(canvas)
-        self:clear(canvas.bgcolor)
-        local elements = betterUI.currentlyEditingWindow._elements
-        
-        local sortedElements = {}
-        for _, element in pairs(elements) do
-            table.insert(sortedElements, element)
-        end
-        table.sort(sortedElements, function(a, b)
-            return (a.zindex or 0) < (b.zindex or 0)
-        end)
-        
-        for _, element in ipairs(sortedElements) do
-            if element.visible then
-                element.draw()
-            end
-        end
-        --Event:fire("canvasOnPaint")
+        betterUI.canvas_update_func(canvas)
+        Event:fire("canvasOnPaint")
     end
 
     function canvas:onClick()
