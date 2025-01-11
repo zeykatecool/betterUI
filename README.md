@@ -1,2 +1,2 @@
 # betterUI
-BetterElements alternative for LuaRT.
+[BetterElements](https://github.com/zeykatecool/betterElements) alternative for LuaRT.
