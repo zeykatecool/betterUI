@@ -80,6 +80,7 @@ end
 
 
 local function drawRectangle(canvas, x, y, width, height, radiusx, radiusy, brush)
+    --require("console").writeln(canvas, x, y, width, height, radiusx, radiusy, brush)
     canvas:fillroundrect(x , y , x + width , y + height, radiusx, radiusy, brush)
 end
 
@@ -205,6 +206,8 @@ function _G.Label(LabelProperties)
         textcolor = LabelProperties.textcolor or 0xFFFFFFFF;
         zindex = LabelProperties.zindex or 0;
         cursor = LabelProperties.cursor or "arrow";
+        stroke = LabelProperties.stroke or 0;
+        strokecolor = LabelProperties.strokecolor or 0x000000FF;
         visible = LabelProperties.visible == nil and true or LabelProperties.visible == true and true or false;
         --enabled = LabelProperties.enabled == nil and true or LabelProperties.enabled == true and true or false;
         BUI = {
@@ -239,11 +242,30 @@ function _G.Label(LabelProperties)
         if f then
             f(CONTROL_TABLE)
         end
+
         canvas.font = CONTROL_TABLE.font
         canvas.fontsize = CONTROL_TABLE.fontsize
         canvas.fontstyle = CONTROL_TABLE.fontstyle
         canvas.fontweight = CONTROL_TABLE.fontweight
+
+        local text = CONTROL_TABLE.text
+
+        local xpos = CONTROL_TABLE.x
+        local ypos = CONTROL_TABLE.y
+
+        local strokeOffset = CONTROL_TABLE.stroke
+        local strokeColor = hexA(CONTROL_TABLE.strokecolor)
+
+        for dx = -strokeOffset, strokeOffset do
+            for dy = -strokeOffset, strokeOffset do
+                if dx ~= 0 or dy ~= 0 then
+                canvas:print(text, xpos + dx, ypos + dy, strokeColor)
+                end
+            end
+        end
         canvas:print(CONTROL_TABLE.text, CONTROL_TABLE.x, CONTROL_TABLE.y, hexA(CONTROL_TABLE.textcolor))
+        
+
         CONTROL_TABLE.width, CONTROL_TABLE.height = canvas:measure(CONTROL_TABLE.text).width, canvas:measure(CONTROL_TABLE.text).height
         for i,v in pairs(CONTROL_TABLE.ORIGINALS) do
             canvas[i] = v
@@ -714,7 +736,6 @@ function _G.Border(BorderProperties)
 end
 
 
-
 function betterUI:MousePositionAccordToWindow(window)
     local mouseX, mouseY = ui.mousepos()
     local windowX, windowY = window.x, window.y
@@ -724,6 +745,7 @@ end
 function betterUI:getTopElementAtMouse()
     assert(betterUI.currentlyEditingWindow, "No active window to check elements.")
     
+
     local mouseX, mouseY = ui.mousepos()
     if betterUI.currentlyEditingWindow._windowproperties.style ~= Enum.WindowStyle.Raw then
         mouseY = mouseY - 32
@@ -739,6 +761,7 @@ function betterUI:getTopElementAtMouse()
     local maxZIndex = -math.huge
 
     for _, element in pairs(betterUI.currentlyEditingWindow._elements) do
+
         if element.visible then
             local elementX = element.x
             local elementY = element.y
@@ -752,11 +775,11 @@ function betterUI:getTopElementAtMouse()
                 if element.zindex > maxZIndex then
                     maxZIndex = element.zindex
                     topElement = element
-                end
-            end
+         
         end
     end
-
+    end
+end
     return topElement
 end
 
@@ -863,7 +886,6 @@ local function onPaint(canvas)
     self:clear(canvas.bgcolor)
     local elements = betterUI.currentlyEditingWindow._elements
 
-    -- Elementleri zindex'e göre sırala
     local sortedElements = {}
     for _, element in pairs(elements) do
         table.insert(sortedElements, element)
@@ -875,7 +897,8 @@ local function onPaint(canvas)
         if not element.visible then return end
         local effectiveX = (parentX or 0) + element.x
         local effectiveY = (parentY or 0) + element.y
-        drawRectangle(canvas, effectiveX, effectiveY, element.width, element.height, element.radius, element.radius, hexA(element.bgcolor))
+        element.draw()
+        --drawRectangle(canvas, effectiveX, effectiveY, element.width, element.height, element.radius, element.radius, hexA(element.bgcolor))
         if element.BUI.CHILDS and #element.BUI.CHILDS > 0 then
             for _, child in ipairs(element.BUI.CHILDS) do
                 drawElement(child, effectiveX, effectiveY)
@@ -907,7 +930,7 @@ local function onClick(canvas)
                  end
              end
          end
-     end
+    end
  end
  
  local function onMouseUp(canvas)
