@@ -211,8 +211,20 @@ function _G.Label(LabelProperties)
             TYPE = "LABEL";
             NAME = LabelProperties.name or _G.betterUI:uniqueName();
             MOUSE_HOVERING = false;
+            CHILDS = {};
+            PARENT = {};
         }
     }
+
+    function CONTROL_TABLE:addChild(c)
+        table.insert(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = CONTROL_TABLE
+    end
+
+    function CONTROL_TABLE:removeChild(c)
+        table.remove(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = {}
+    end
 
         canvas.font = CONTROL_TABLE.font
         canvas.fontsize = CONTROL_TABLE.fontsize
@@ -270,20 +282,23 @@ function _G.Frame(FrameProperties)
         cursor = FrameProperties.cursor or "arrow";
         visible = FrameProperties.visible == nil and true or FrameProperties.visible == true and true or false,
         --enabled = FrameProperties.enabled == nil and true or FrameProperties.enabled == true and true or false,
-        childs = {};
         BUI = {
             TYPE = "FRAME";
             NAME = FrameProperties.name or _G.betterUI:uniqueName();
             MOUSE_HOVERING = false;
+            CHILDS = {};
+            PARENT = {};
         }
     }
 
     function CONTROL_TABLE:addChild(c)
-        table.insert(CONTROL_TABLE.childs, c)
+        table.insert(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = CONTROL_TABLE
     end
 
     function CONTROL_TABLE:removeChild(c)
-        table.remove(CONTROL_TABLE.childs, c)
+        table.remove(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = {}
     end
 
     function CONTROL_TABLE:center()
@@ -342,8 +357,20 @@ function _G.Button(ButtonProperties)
             TYPE = "BUTTON";
             NAME = ButtonProperties.name or _G.betterUI:uniqueName();
             MOUSE_HOVERING = false;
+            CHILDS = {};
+            PARENT = {};
         }
     }
+
+    function CONTROL_TABLE:addChild(c)
+        table.insert(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = CONTROL_TABLE
+    end
+
+    function CONTROL_TABLE:removeChild(c)
+        table.remove(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = {}
+    end
 
     CONTROL_TABLE.draw = function(f)
         if f then
@@ -394,8 +421,20 @@ function _G.Image(ImageProperties)
             TYPE = "IMAGE";
             NAME = ImageProperties.name or _G.betterUI:uniqueName();
             MOUSE_HOVERING = false;
+            CHILDS = {};
+            PARENT = {};
         }
     }
+
+    function CONTROL_TABLE:addChild(c)
+        table.insert(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = CONTROL_TABLE
+    end
+
+    function CONTROL_TABLE:removeChild(c)
+        table.remove(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = {}
+    end
 
     CONTROL_TABLE.draw = function(f)
         if f then
@@ -434,8 +473,20 @@ function _G.Point(PointProperties)
             TYPE = "POINT";
             NAME = PointProperties.name or _G.betterUI:uniqueName();
             MOUSE_HOVERING = false;
+            CHILDS = {};
+            PARENT = {};
         }
     }
+
+    function CONTROL_TABLE:addChild(c)
+        table.insert(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = CONTROL_TABLE
+    end
+
+    function CONTROL_TABLE:removeChild(c)
+        table.remove(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = {}
+    end
 
     CONTROL_TABLE.draw = function(f)
         if f then
@@ -478,8 +529,20 @@ function _G.CheckBox(CheckBoxProperties)
             TYPE = "CHECKBOX";
             NAME = CheckBoxProperties.name or _G.betterUI:uniqueName();
             MOUSE_HOVERING = false;
+            CHILDS = {};
+            PARENT = {};
         }
     }
+
+    function CONTROL_TABLE:addChild(c)
+        table.insert(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = CONTROL_TABLE
+    end
+
+    function CONTROL_TABLE:removeChild(c)
+        table.remove(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = {}
+    end
 
     CONTROL_TABLE.draw = function(f)
         if f then
@@ -561,8 +624,20 @@ function _G.Circle(CircleProperties)
             TYPE = "CIRCLE";
             NAME = CircleProperties.name or _G.betterUI:uniqueName();
             MOUSE_HOVERING = false;
+            CHILDS = {};
+            PARENT = {};
         }
     }
+
+    function CONTROL_TABLE:addChild(c)
+        table.insert(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = CONTROL_TABLE
+    end
+
+    function CONTROL_TABLE:removeChild(c)
+        table.remove(CONTROL_TABLE.BUI.CHILDS, c)
+        c.BUI.PARENT = {}
+    end
 
     CONTROL_TABLE.draw = function(f)
         if f then
@@ -620,8 +695,6 @@ function _G.Border(BorderProperties)
             CONTROL_TABLE.height = CONTROL_TABLE.element.height
             if CONTROL_TABLE.element.radius then
                 CONTROL_TABLE.radius = CONTROL_TABLE.element.radius
-            else
-                CONTROL_TABLE.radius = 0
             end
             CONTROL_TABLE.zindex = CONTROL_TABLE.element.zindex + 1
         end
@@ -639,6 +712,8 @@ function _G.Border(BorderProperties)
     betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME] = CONTROL_TABLE
     return betterUI.currentlyEditingWindow._elements[CONTROL_TABLE.BUI.NAME]
 end
+
+
 
 function betterUI:MousePositionAccordToWindow(window)
     local mouseX, mouseY = ui.mousepos()
@@ -781,11 +856,14 @@ function betterUI:isMouseOnLine(line)
     return distance <= (line.thickness / 2)
 end
 
+
+
 local function onPaint(canvas)
     local self = canvas
     self:clear(canvas.bgcolor)
     local elements = betterUI.currentlyEditingWindow._elements
-    
+
+    -- Elementleri zindex'e göre sırala
     local sortedElements = {}
     for _, element in pairs(elements) do
         table.insert(sortedElements, element)
@@ -793,13 +871,25 @@ local function onPaint(canvas)
     table.sort(sortedElements, function(a, b)
         return (a.zindex or 0) < (b.zindex or 0)
     end)
+    local function drawElement(element, parentX, parentY)
+        if not element.visible then return end
+        local effectiveX = (parentX or 0) + element.x
+        local effectiveY = (parentY or 0) + element.y
+        drawRectangle(canvas, effectiveX, effectiveY, element.width, element.height, element.radius, element.radius, hexA(element.bgcolor))
+        if element.BUI.CHILDS and #element.BUI.CHILDS > 0 then
+            for _, child in ipairs(element.BUI.CHILDS) do
+                drawElement(child, effectiveX, effectiveY)
+            end
+        end
+    end
 
     for _, element in ipairs(sortedElements) do
-        if element.visible then
-            element.draw()
+        if not element.BUI.PARENT or next(element.BUI.PARENT) == nil then
+            drawElement(element)
         end
     end
 end
+
 
 
 local function onClick(canvas)
