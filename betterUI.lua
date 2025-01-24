@@ -20,11 +20,6 @@ _G.betterUI = {
 
 _G.Brush = {}
 
-function Brush.newImage(Path)
-    assert(betterUI.currentlyEditingWindow, "No active window to edit.")
-    return betterUI.currentlyEditingWindow.canvas:Image(Path)
-end
-
 function Brush.newLinearGradient(GradientTable,StartPositionTable,StopPositionTable,Opacity)
     assert(betterUI.currentlyEditingWindow, "No active window to edit.")
     local g = betterUI.currentlyEditingWindow.canvas:LinearGradient(GradientTable)
