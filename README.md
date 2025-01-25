@@ -53,6 +53,10 @@ local label = Label{
 
 label:center()
 
+label.onHover = function()
+    print(MousePosition())
+end
+
 --Event and Enum are global objects of BetterUI.
 Event:onFire(Enum.EmbeddedEvents.windowOnKey, function(key)
     if key == "VK_ESCAPE" then
