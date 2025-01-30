@@ -719,35 +719,6 @@ function _G.Border(BorderProperties)
 end
 
 
-function _G.Blur(BlurProperties)
-    local canvas = betterUI.currentlyEditingWindow.canvas
-
-    local CONTROL_TABLE = {
-        x = BlurProperties.x or 0;
-        y = BlurProperties.y or 0;
-        width = BlurProperties.width or 20;
-        height = BlurProperties.height or 20;
-        radius = BlurProperties.radius or 0;
-        zindex = BlurProperties.zindex or 0;
-        cursor = BlurProperties.cursor or "arrow";
-        bgcolor = BlurProperties.bgcolor or 0x000000FF;
-        visible = BlurProperties.visible == nil and true or BlurProperties.visible == true and true or false;
-        --enabled = BlurProperties.enabled == nil and true or BlurProperties.enabled == true and true or false;
-        BUI = {
-            TYPE = "BLUR";
-            NAME = BlurProperties.name or _G.betterUI:uniqueName();
-            MOUSE_HOVERING = false;
-            PARENT = {};
-        }
-    }
-
-    CONTROL_TABLE.draw = function(f)
-        
-
-    end
-
-end
-
 function betterUI:MousePositionAccordToWindow(window)
     local mouseX, mouseY = ui.mousepos()
     local windowX, windowY = window.x, window.y
@@ -1034,14 +1005,14 @@ local t = sys.clock()
 function _G.Update(Functions)
     if not Functions then Functions = function(dt) end end
     while betterUI.updateHolder do
+        local dt = sys.clock() - t
+        t = sys.clock()
+        Functions(dt)
         local TARGETFPS = betterUI.TARGET_FPS
         local startTime = sys.clock()
         local timePerFrame = 1000 / TARGETFPS
         ui.update()
-        local dt = sys.clock() - t
-        t = sys.clock()
         betterUI.currentlyEditingWindow.canvas.cursor = betterUI.CURSORTO
-        Functions(dt)
         local elapsedTime = sys.clock() - startTime
         local sleepTime = timePerFrame - elapsedTime
         if sleepTime > 0 then
@@ -1049,3 +1020,4 @@ function _G.Update(Functions)
         end
     end
 end
+
