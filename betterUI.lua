@@ -125,19 +125,13 @@ function _G.Window(WindowProperties)
     canvas.align = "all"
     canvas.bgcolor = hexA(WindowProperties.bgcolor) or 0x000000FF
 
-    local lastUpdate = sys.clock()
-    local targetFps = betterUI.TARGET_FPS or 60
-    local frameDuration = 1000 / targetFps
     function canvas:onPaint()
-        local currentTime = sys.clock()
-        local deltaTime = currentTime - lastUpdate
-
-        if deltaTime >= frameDuration then
-            betterUI.canvas_update_func(canvas)
-            Event:fire("canvasOnPaint")
-        end
+        self:begin()
+        self:clear(canvas.bgcolor)
+        betterUI.canvas_update_func(canvas)
+        Event:fire("canvasOnPaint")
+        self:flip()
     end
-
     function canvas:onClick()
         betterUI.canvas_click_func(canvas)
         Event:fire("canvasOnClick",MousePosition().x,MousePosition().y)
@@ -731,6 +725,35 @@ function _G.Border(BorderProperties)
 end
 
 
+function _G.Blur(BlurProperties)
+    local canvas = betterUI.currentlyEditingWindow.canvas
+
+    local CONTROL_TABLE = {
+        x = BlurProperties.x or 0;
+        y = BlurProperties.y or 0;
+        width = BlurProperties.width or 20;
+        height = BlurProperties.height or 20;
+        radius = BlurProperties.radius or 0;
+        zindex = BlurProperties.zindex or 0;
+        cursor = BlurProperties.cursor or "arrow";
+        bgcolor = BlurProperties.bgcolor or 0x000000FF;
+        visible = BlurProperties.visible == nil and true or BlurProperties.visible == true and true or false;
+        --enabled = BlurProperties.enabled == nil and true or BlurProperties.enabled == true and true or false;
+        BUI = {
+            TYPE = "BLUR";
+            NAME = BlurProperties.name or _G.betterUI:uniqueName();
+            MOUSE_HOVERING = false;
+            PARENT = {};
+        }
+    }
+
+    CONTROL_TABLE.draw = function(f)
+        
+
+    end
+
+end
+
 function betterUI:MousePositionAccordToWindow(window)
     local mouseX, mouseY = ui.mousepos()
     local windowX, windowY = window.x, window.y
@@ -1011,16 +1034,26 @@ _G.betterUI.canvas_onhover_func = onHover
 _G.betterUI.canvas_onmouseup_func = onMouseUp
 
 
-local t = os.clock()
+
+local t = sys.clock()
 function _G.Update(Functions)
-    if not Functions then Functions=function(dt)end end
+    if not Functions then Functions = function(dt) end end
     while betterUI.updateHolder do
+        local targetFPS = betterUI.TARGET_FPS
+        local targetFrameTime = 1000 / targetFPS
+        local startTime = sys.clock()
         ui.update()
-        local dt = os.clock() - t
-        t = os.clock()
+        local dt = startTime - t
+        t = startTime
         betterUI.currentlyEditingWindow.canvas.cursor = betterUI.CURSORTO
         Functions(dt)
-        for i,v in pairs(betterUI.alsoAddUpdate) do
+
+        local frameTime = sys.clock() - startTime
+        local sleepTime = targetFrameTime - frameTime
+        if sleepTime > 0 then
+            sleep(math.floor(sleepTime))
+        end
+        for i, v in pairs(betterUI.alsoAddUpdate) do
             v(dt)
         end
     end
