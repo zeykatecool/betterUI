@@ -28,3 +28,5 @@
 - `betterUI:kill()` - Kills all objects,including window.
 - `betterUI:uniqueName()` - Generates a 7 character long unique name.
 - `betterUI:targetFps(n)` - Sets target FPS.
+> Warning for `targetFps`:
+- Sometimes it doesn't work properly and I have no idea why.
