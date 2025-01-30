@@ -66,8 +66,8 @@ Event:onFire(Enum.EmbeddedEvents.windowOnKey, function(key)
 end)
 
 
-Update(function(dt) --Using internal timer of Lua. (os.clock)
-    local fps = math.floor(1 / dt)
+Update(function(dt) --Using internal timer of LuaRT. (sys.clock)
+    local fps = math.floor(1000 / dt)
     Win:status("FPS: " .. fps)
 end)
 ```
