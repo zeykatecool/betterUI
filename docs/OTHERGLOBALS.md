@@ -29,4 +29,3 @@
 - `betterUI:addToUpdate(f)` - Adds a function to update loop.
 - `betterUI:uniqueName()` - Generates a 7 character long unique name.
 - `betterUI:targetFps(n)` - Sets target FPS.
-> Depends on LuaRT 1.9.0 (or higher),default (LuaRT 1.8.0) is 60 and can not be changed.Also LuaRT 1.9.0* has a bug that effects Canvas module so it can't be used. <sub>*LuaRT 1.9.0 Oct 28, 2024 [Github](https://github.com/samyeyo/LuaRT/releases/tag/v1.9.0-preview)</sub>
