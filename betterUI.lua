@@ -56,12 +56,6 @@ function betterUI:currentlyEditing(w)
     return w
 end
 
-function betterUI:addToUpdate(f)
-    if type(f) ~= "function" then return false end
-    table.insert(betterUI.alsoAddUpdate,f)
-    return true
-end
-
 math.randomseed(os.time())
 function betterUI:uniqueName()
     local name = ""
@@ -1036,25 +1030,22 @@ _G.betterUI.canvas_onmouseup_func = onMouseUp
 
 
 local t = sys.clock()
+
 function _G.Update(Functions)
     if not Functions then Functions = function(dt) end end
     while betterUI.updateHolder do
-        local targetFPS = betterUI.TARGET_FPS
-        local targetFrameTime = 1000 / targetFPS
+        local TARGETFPS = betterUI.TARGET_FPS
         local startTime = sys.clock()
+        local timePerFrame = 1000 / TARGETFPS
         ui.update()
-        local dt = startTime - t
-        t = startTime
+        local dt = sys.clock() - t
+        t = sys.clock()
         betterUI.currentlyEditingWindow.canvas.cursor = betterUI.CURSORTO
         Functions(dt)
-
-        local frameTime = sys.clock() - startTime
-        local sleepTime = targetFrameTime - frameTime
+        local elapsedTime = sys.clock() - startTime
+        local sleepTime = timePerFrame - elapsedTime
         if sleepTime > 0 then
             sleep(math.floor(sleepTime))
-        end
-        for i, v in pairs(betterUI.alsoAddUpdate) do
-            v(dt)
         end
     end
 end
