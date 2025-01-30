@@ -2,6 +2,7 @@
 - This module is made for making better elements for [LuaRT](https://github.com/samyeyo/LuaRT/).
 - It's less buggy than [betterElements](https://github.com/zeykatecool/betterElements) and more powerful.
 - [Docs](https://github.com/zeykatecool/betterUI/tree/main/docs)
+> Supports LuaRT 1.9.0,should expect it not to work on an older version.
 
 # Features
 - You can use **onHover**,**onLeave**,**onMouseUp**,**onClick**, and **onRightClick** on any element,unlike betterElements.
