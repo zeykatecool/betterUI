@@ -26,6 +26,5 @@
 - You can use **betterUI** object for easy use of BetterUI.
 
 - `betterUI:kill()` - Kills all objects,including window.
-- `betterUI:addToUpdate(f)` - Adds a function to update loop.
 - `betterUI:uniqueName()` - Generates a 7 character long unique name.
 - `betterUI:targetFps(n)` - Sets target FPS.
