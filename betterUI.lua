@@ -95,6 +95,15 @@ function _G.Window(WindowProperties)
     WindowProperties.x = WindowProperties.x or 0
     WindowProperties.y = WindowProperties.y or 0
 
+    function window:onDrop(kind,content)
+        Event:fire("windowOnDrop",kind,content)
+    end
+
+    function window:onThemeChange(isdark)
+        local theme = isdark and "dark" or "light"
+        Event:fire("windowOnThemeChange",theme)
+    end
+
     function window:onKey(key)
         Event:fire("windowOnKey", key)
     end
@@ -998,26 +1007,40 @@ _G.betterUI.canvas_rightclick_func = onContext
 _G.betterUI.canvas_onhover_func = onHover
 _G.betterUI.canvas_onmouseup_func = onMouseUp
 
+_G.betterUI.forcingUpdate = false
 
+function betterUI:forceUpdateWithoutWindow()
+    _G.betterUI.forcingUpdate = true
+end
 
 local t = sys.clock()
+local drift = 0
 
 function _G.Update(Functions)
     if not Functions then Functions = function(dt) end end
     while betterUI.updateHolder do
+        ui.update()
         local dt = sys.clock() - t
         t = sys.clock()
         Functions(dt)
+
         local TARGETFPS = betterUI.TARGET_FPS
         local startTime = sys.clock()
         local timePerFrame = 1000 / TARGETFPS
-        ui.update()
-        betterUI.currentlyEditingWindow.canvas.cursor = betterUI.CURSORTO
+        
+        if not betterUI.forcingUpdate then
+            betterUI.currentlyEditingWindow.canvas.cursor = betterUI.CURSORTO
+        end
+
         local elapsedTime = sys.clock() - startTime
-        local sleepTime = timePerFrame - elapsedTime
-        if sleepTime > 0 then
-            sleep(math.floor(sleepTime))
+        local sleepTime = timePerFrame - elapsedTime + drift
+
+        local sleepMs = math.floor(sleepTime)
+        if sleepMs > 0 then
+            sleep(sleepMs)
+            drift = sleepTime - sleepMs
+        else
+            drift = 0
         end
     end
 end
-
