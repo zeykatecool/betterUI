@@ -1,4 +1,5 @@
 # Other Globals for using BetterUI
+> Check module itself for more globals.
 
 ## Event Object
 - You can use **Event** object for easy event handling and interact with elements.
