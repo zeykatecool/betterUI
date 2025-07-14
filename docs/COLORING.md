@@ -115,7 +115,7 @@ end)
 - It's a function for `Window` element.
 ```lua
     --[[
-    function window:makeTransparency()
+    function window:makeTransparency(WindowName)
         local C = require("c")
         local bit32 = require("bit32")
         local user32 = C.Library("user32.dll")
@@ -128,7 +128,7 @@ end)
         local GWL_EXSTYLE = -20
         local WS_EX_LAYERED = 0x80000
         local LWA_COLORKEY = 0x1
-        local HWND = user32.FindWindowA(nil, window.name)
+        local HWND = user32.FindWindowA(nil, WindowName)
 
         if HWND ~= nil then
             local style = user32.GetWindowLongA(HWND, GWL_EXSTYLE)
@@ -140,6 +140,6 @@ end)
     end
     ]]--
 
-    window:makeTransparency() -- Makes the Window transparent,not the elements. Works best with `Raw` Window's.
+    window:makeTransparency(WindowName) -- Makes the Window transparent,not the elements. Works best with `Raw` Window's.
 
 ```
