@@ -1,9 +1,9 @@
 local ui = require("ui")
 local sys = require("sys")
 require("canvas")
-require("enum")
-require("colorProcess")
-require("event")
+require("lib.betterui.enum")
+require("lib.betterui.colorProcess")
+require("lib.betterui.event")
 _G.betterUI = {
     debugging = false;
     updateHolder = true;
@@ -15,7 +15,7 @@ _G.betterUI = {
     canvas_onhover_func = function(s) end;
     canvas_onmouseup_func = function(s) end;
     CURSORTO = "arrow";
-    TARGET_FPS = 60;
+    TARGET_FPS = 100;
 }
 
 _G.Brush = {}
@@ -94,6 +94,31 @@ function _G.Window(WindowProperties)
         
     WindowProperties.x = WindowProperties.x or 0
     WindowProperties.y = WindowProperties.y or 0
+
+
+    function window:windowTransparency(transparency)
+        local C = require("c")
+        local bit32 = require("bit32")
+        local user32 = C.Library("user32.dll")
+        user32.FindWindowA = "(ZZ)p"
+        user32.GetWindowLongA = "(pi)i"
+        user32.SetWindowLongA = "(pii)i"
+        user32.SetLayeredWindowAttributes = "(piCi)i"
+        
+        --thank god this is the correct ones
+        local GWL_EXSTYLE = -20
+        local WS_EX_LAYERED = 0x80000
+        local LWA_COLORKEY = 0x1
+        local HWND = user32.FindWindowA(nil, window.name)
+
+        if HWND ~= nil then
+            local style = user32.GetWindowLongA(HWND, GWL_EXSTYLE)
+            user32.SetWindowLongA(HWND, GWL_EXSTYLE, bit32.bor(style, WS_EX_LAYERED))
+            user32.SetLayeredWindowAttributes(HWND, 0x000000, 255, LWA_COLORKEY)
+        else
+            error("Window name is wrong,this is weird.")
+        end
+    end
 
     function window:onDrop(kind,content)
         Event:fire("windowOnDrop",kind,content)
@@ -714,6 +739,11 @@ function _G.Border(BorderProperties)
         end
         drawBorder(canvas, CONTROL_TABLE.x, CONTROL_TABLE.y, CONTROL_TABLE.width, CONTROL_TABLE.height, CONTROL_TABLE.radius, CONTROL_TABLE.radius, hexA(CONTROL_TABLE.color), CONTROL_TABLE.thickness)
         return true
+    end
+
+    function CONTROL_TABLE:center()
+        CONTROL_TABLE.x = (betterUI.currentlyEditingWindow.width / 2) - (CONTROL_TABLE.width / 2)
+        CONTROL_TABLE.y = (betterUI.currentlyEditingWindow.height / 2) - (CONTROL_TABLE.height / 2)
     end
 
     CONTROL_TABLE.onHover = BorderProperties.onHover or function() end
