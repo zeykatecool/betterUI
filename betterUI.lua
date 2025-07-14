@@ -96,7 +96,7 @@ function _G.Window(WindowProperties)
     WindowProperties.y = WindowProperties.y or 0
 
 
-    function window:makeTransparency()
+    function window:makeTransparent()
         local C = require("c")
         local bit32 = require("bit32")
         local user32 = C.Library("user32.dll")
