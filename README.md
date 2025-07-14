@@ -25,6 +25,8 @@
 
 - Much better global **betterUI**.
 
+- Can make window background transparent via `C`.
+
 # Quick Start
 - It's so easy to use,just require it from your main script.
 ```lua
