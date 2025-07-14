@@ -114,7 +114,7 @@ function _G.Window(WindowProperties)
         if HWND ~= nil then
             local style = user32.GetWindowLongA(HWND, GWL_EXSTYLE)
             user32.SetWindowLongA(HWND, GWL_EXSTYLE, bit32.bor(style, WS_EX_LAYERED))
-            user32.SetLayeredWindowAttributes(HWND, 0x000000, 255, LWA_COLORKEY)
+            user32.SetLayeredWindowAttributes(HWND, 0x000000, transparency, LWA_COLORKEY)
         else
             error("Window name is wrong,this is weird.")
         end
