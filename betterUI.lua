@@ -96,7 +96,7 @@ function _G.Window(WindowProperties)
     WindowProperties.y = WindowProperties.y or 0
 
 
-    function window:makeTransparency(WindowName)
+    function window:makeTransparency()
         local C = require("c")
         local bit32 = require("bit32")
         local user32 = C.Library("user32.dll")
@@ -109,7 +109,7 @@ function _G.Window(WindowProperties)
         local GWL_EXSTYLE = -20
         local WS_EX_LAYERED = 0x80000
         local LWA_COLORKEY = 0x1
-        local HWND = user32.FindWindowA(nil, WindowName)
+        local HWND = user32.FindWindowA(nil, window.title)
 
         if HWND ~= nil then
             local style = user32.GetWindowLongA(HWND, GWL_EXSTYLE)
