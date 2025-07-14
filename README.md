@@ -1,12 +1,14 @@
 # BetterUI for LuaRT
 - This module is made for making better elements for [LuaRT](https://github.com/samyeyo/LuaRT/).
 - It's less buggy than [betterElements](https://github.com/zeykatecool/betterElements) and more powerful.
+- Also uses the new `C` that comes with new LuaRT versions.
 - [Docs](https://github.com/zeykatecool/betterUI/tree/main/docs)
 > ⚠️ | Supports LuaRT 1.9.0, **probably** does not work in older versions.
 
 # Warnings
 - If you only need Update function you can use `betterUI:forceUpdateWithoutWindow()`. You can manually add Window with `betterUI.currentlyEditingWindow`.
-- `canvas:onMouseUp(x,y,b)` does not work on LuaRT 2.0.1 x64,confirmed by [Sam](https://github.com/samyeyo). You can use `User32.dll` via `C` module of LuaRT to access user inputs. See the example at [docs/C.md](https://github.com/zeykatecool/betterUI/blob/main/docs/C.md).
+- `canvas:onMouseUp(x,y,b)` does not work on LuaRT 2.0.1 x64,confirmed by [Sam](https://github.com/samyeyo).
+- You can use `User32.dll` via `C` module of LuaRT to access user inputs. See the example at [docs/C.md](https://github.com/zeykatecool/betterUI/blob/main/docs/C.md).
 
 # Features
 - You can use **onHover**,**onLeave**,**onMouseUp**,**onClick**, and **onRightClick** on any element,unlike betterElements.
