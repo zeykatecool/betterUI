@@ -1,9 +1,9 @@
 local ui = require("ui")
 local sys = require("sys")
 require("canvas")
-require("lib.betterui.enum")
-require("lib.betterui.colorProcess")
-require("lib.betterui.event")
+require("enum")
+require("colorProcess")
+require("event")
 _G.betterUI = {
     debugging = false;
     updateHolder = true;
@@ -96,7 +96,7 @@ function _G.Window(WindowProperties)
     WindowProperties.y = WindowProperties.y or 0
 
 
-    function window:windowTransparency(transparency)
+    function window:makeTransparency()
         local C = require("c")
         local bit32 = require("bit32")
         local user32 = C.Library("user32.dll")
@@ -104,7 +104,7 @@ function _G.Window(WindowProperties)
         user32.GetWindowLongA = "(pi)i"
         user32.SetWindowLongA = "(pii)i"
         user32.SetLayeredWindowAttributes = "(piCi)i"
-        
+
         --thank god this is the correct ones
         local GWL_EXSTYLE = -20
         local WS_EX_LAYERED = 0x80000
@@ -114,7 +114,7 @@ function _G.Window(WindowProperties)
         if HWND ~= nil then
             local style = user32.GetWindowLongA(HWND, GWL_EXSTYLE)
             user32.SetWindowLongA(HWND, GWL_EXSTYLE, bit32.bor(style, WS_EX_LAYERED))
-            user32.SetLayeredWindowAttributes(HWND, 0x000000, transparency, LWA_COLORKEY)
+            user32.SetLayeredWindowAttributes(HWND, 0x000000, 255, LWA_COLORKEY)
         else
             error("Window name is wrong,this is weird.")
         end
