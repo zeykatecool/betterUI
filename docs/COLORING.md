@@ -115,7 +115,7 @@ end)
 - It's a function for `Window` element.
 ```lua
     --[[
-    function window:makeTransparency()
+    function window:makeTransparent()
         local C = require("c")
         local bit32 = require("bit32")
         local user32 = C.Library("user32.dll")
